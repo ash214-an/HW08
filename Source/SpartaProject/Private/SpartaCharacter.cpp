@@ -24,6 +24,10 @@ ASpartaCharacter::ASpartaCharacter()
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidget->SetupAttachment(GetMesh());
 	OverheadWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	OverheadWidget->SetRelativeLocation(FVector(0.f, 0.f, 100.f)); 
+	OverheadWidget->SetDrawSize(FVector2D(200.f, 50.f));
+	OverheadWidget->SetVisibility(true);
+	OverheadWidget->SetHiddenInGame(false);
 
 	NormalSpeed = 600.0f;
 	SprintSpeedMultiplier = 1.7f;
@@ -33,13 +37,40 @@ ASpartaCharacter::ASpartaCharacter()
 
 	MaxHealth = 100.0f;
 	Health = MaxHealth;
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/UI/WBP_HP"));
+	if (WidgetClass.Succeeded())
+	{
+		OverheadWidget->SetWidgetClass(WidgetClass.Class);
+	}
 }
 
 void ASpartaCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	UpdateOverheadHP();
 
+	UE_LOG(LogTemp, Warning, TEXT("BeginPlay "));
+
+	if (!OverheadWidget)
+	{
+		UE_LOG(LogTemp, Error, TEXT("OverheadWidget null"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("OverheadWidget"));
+
+		UUserWidget* WidgetInstance = OverheadWidget->GetUserWidgetObject();
+		if (!WidgetInstance)
+		{
+			UE_LOG(LogTemp, Error, TEXT("OverheadWidget null"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT(" %s"), *WidgetInstance->GetName());
+		}
+	}
+
+	UpdateOverheadHP();
 }
 
 
@@ -208,6 +239,12 @@ void ASpartaCharacter::UpdateOverheadHP()
 	if (!OverheadWidget) return;
 
 	UUserWidget* OverheadWidgetInstance = OverheadWidget->GetUserWidgetObject();
+
+	if (!OverheadWidget->GetUserWidgetObject())
+	{
+		UE_LOG(LogTemp, Error, TEXT("OverheadWidget has no widget instance!"));
+	}
+
 	if (!OverheadWidgetInstance) return;
 
 	if (UTextBlock* HPText = Cast<UTextBlock>(OverheadWidgetInstance->GetWidgetFromName(TEXT("OverHeadHP"))))

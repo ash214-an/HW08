@@ -22,6 +22,7 @@ void ASpartaGameState::BeginPlay()
 {
     Super::BeginPlay();
 
+    
     StartLevel();
 
     GetWorldTimerManager().SetTimer(
@@ -98,7 +99,8 @@ void ASpartaGameState::StartLevel()
         &ASpartaGameState::OnLevelTimeUp,
         LevelDuration,
         false
-    );    
+    );  
+
 }
 
 void ASpartaGameState::OnLevelTimeUp()
